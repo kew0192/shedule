@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fit it - Расписание</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f8f5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 25px 30px 30px;
+            box-shadow: 0 2px 12px rgba(0, 80, 0, 0.08);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8f0e8;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        select {
+            padding: 8px 14px;
+            border: 2px solid #d4e8d4;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            color: #2d5a2d;
+            outline: none;
+            cursor: pointer;
+            min-width: 160px;
+        }
+
+        select:focus {
+            border-color: #2d7a2d;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: #2d7a2d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: #1f5a1f;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .btn-danger {
+            background: #c0392b;
+        }
+
+        .btn-danger:hover {
+            background: #a93226;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #2d7a2d;
+            border: 2px solid #2d7a2d;
+        }
+
+        .btn-outline:hover {
+            background: #2d7a2d;
+            color: white;
+        }
+
+        .btn-logout {
+            background: #e74c3c;
+        }
+
+        .btn-logout:hover {
+            background: #c0392b;
+        }
+
+        .btn-active {
+            background: #1f5a1f;
+            box-shadow: 0 0 0 2px #2d7a2d;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        th {
+            background: #2d7a2d;
+            color: white;
+            padding: 10px 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        td {
+            padding: 10px 12px;
+            text-align: center;
+            border: 1px solid #dde8dd;
+        }
+
+        tr:nth-child(even) td {
+            background: #f8fbf8;
+        }
+
+        tr:hover td {
+            background: #edf5ed;
+        }
+
+        .empty-schedule {
+            color: #7a9a7a;
+            font-style: italic;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        dialog {
+            border: none;
+            border-radius: 12px;
+            padding: 30px 35px;
+            max-width: 420px;
+            width: 90%;
+            background: white;
+            box-shadow: 0 8px 30px rgba(0, 50, 0, 0.15);
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 30, 0, 0.3);
+        }
+
+        dialog h2 {
+            color: #2d5a2d;
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        dialog h3 {
+            color: #5a7a5a;
+            font-size: 14px;
+            font-weight: normal;
+            margin-bottom: 18px;
+        }
+
+        dialog input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #d4e8d4;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        dialog input:focus {
+            border-color: #2d7a2d;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .dialog-buttons button {
+            flex: 1;
+        }
+
+        .dialog-buttons .btn-close {
+            background: #b0c8b0;
+        }
+
+        .dialog-buttons .btn-close:hover {
+            background: #8aaa8a;
+        }
+
+        #users-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 12px 0 16px;
+        }
+
+        #users-list table {
+            font-size: 13px;
+        }
+
+        #users-list th {
+            background: #2d7a2d;
+            color: white;
+            padding: 8px 10px;
+        }
+
+        #users-list td {
+            padding: 8px 10px;
+            border: 1px solid #dde8dd;
+        }
+
+        #users-list tr:nth-child(even) td {
+            background: #f8fbf8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-left, .header-right {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            select {
+                min-width: 120px;
+                width: 100%;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 7px 12px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 6px 8px;
+            }
+
+            dialog {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            table {
+                font-size: 10px;
+            }
+
+            th, td {
+                padding: 4px 5px;
+            }
+
+            .header-left, .header-right {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-left select {
+                width: 100%;
+            }
+
+            .header-right {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .header-right button {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <select id="class">
+                <option value="">Загрузка...</option>
+            </select>
+            <button id="DeleteClass" class="btn-danger">Удалить класс</button>
+            <button id="MySchedule" class="btn-outline">Мое расписание</button>
+        </div>
+        <div class="header-right">
+            <button id="ViewUsers">Пользователи</button>
+            <button id="ExportExcel">Экспорт</button>
+            <button id="ExportAllClasses">Экспорт всех</button>
+            <button id="AddClass">Добавить класс</button>
+            <button id="OpenTeacherModal">Учитель на Просмотр</button>
+            <button id="OpenTeacherModal1">Учитель на Расписание</button>
+            <button id="AddLesson">Добавить Уроки</button>
+            <a href="/login.html" style="text-decoration: none;">
+                <button class="btn-logout">Выйти</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <table id="schedule">
+        <thead>
+            <tr>
+                <th>Урок</th>
+                <th>Понедельник</th>
+                <th>Вторник</th>
+                <th>Среда</th>
+                <th>Четверг</th>
+                <th>Пятница</th>
+            </tr>
+        </thead>
+        <tbody id="schedule-body">
+            <tr><td colspan="6" class="empty-schedule">Выберите класс</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Dialog: Add Class -->
+<dialog id="ClassAdd">
+    <h2>Добавить класс</h2>
+    <h3>Введите имя класса</h3>
+    <input type="text" id="addclassinput" placeholder="Например: 10А">
+    <div class="dialog-buttons">
+        <button id="AddClassBtn">Создать</button>
+        <button id="CloseClassAdd" class="btn-close">Закрыть</button>
+    </div>
+</dialog>
+
+<!-- Dialog: Teacher -->
+<dialog id="TeacherAdd">
+    <h2>Добавить учителя</h2>
+    <h3>Введите имя, фамилию и предмет</h3>
+    <input type="text" id="f" placeholder="Имя">
+    <input type="text" id="l" placeholder="Фамилия">
+    <input type="text" id="teacher_subject" placeholder="Предмет">
+    <div class="dialog-buttons">
+        <button id="AddTeacherBtn">Создать</button>
+        <button id="CloseTeacherAdd" class="btn-close">Закрыть</button>
+    </div>
+</dialog>
+
+<!-- Dialog: Teacher + -->
+<dialog id="TeacherAdd1">
+    <h2>Добавить учителя</h2>
+    <h3>Введите имя, фамилию и предмет</h3>
+    <input type="text" id="f1" placeholder="Имя">
+    <input type="text" id="l1" placeholder="Фамилия">
+    <input type="text" id="teacher_subject1" placeholder="Предмет">
+    <div class="dialog-buttons">
+        <button id="AddTeacherBtn1">Создать</button>
+        <button id="CloseTeacherAdd1" class="btn-close">Закрыть</button>
+    </div>
+</dialog>
+
+<!-- Dialog: Add Lessons -->
+<dialog id="LessonAdd">
+    <h2>Добавить уроки</h2>
+    <h3>Выберите класс, учителя и предмет</h3>
+    <input type="text" id="lesson_class" placeholder="Название класса">
+    <input type="text" id="lesson_teacher" placeholder="Имя учителя">
+    <input type="text" id="lesson_subject" placeholder="Предмет">
+    <input type="number" id="lesson_hours" placeholder="Количество часов" min="1" max="40">
+    <div class="dialog-buttons">
+        <button id="AddLessonBtn">Добавить</button>
+        <button id="CloseLessonAdd" class="btn-close">Закрыть</button>
+    </div>
+</dialog>
+
+<!-- Dialog: Users -->
+<dialog id="UsersModal">
+    <h2>Пользователи</h2>
+    <div id="users-list">
+        <p>Загрузка...</p>
+    </div>
+    <div class="dialog-buttons">
+        <button id="CloseUsersModal" class="btn-close">Закрыть</button>
+    </div>
+</dialog>
+
+<script>
+    document.querySelector('.btn-logout')?.addEventListener('click', function(e) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('first_name');
+        localStorage.removeItem('last_name');
+        localStorage.removeItem('role');
+        localStorage.removeItem('code');
+        window.location.href = '/index.html';
+    });
+</script>
+
+<script src="js_scripts/main.js"></script>
+</body>
+</html>
